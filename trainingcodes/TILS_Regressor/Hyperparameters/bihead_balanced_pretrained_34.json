@@ -1,0 +1,12 @@
+{
+    "SAVE_DIR":"../Results",
+    "TRAINREPEATS":1000,
+    "TESTREPEATS":100,
+    "LEARNINGRATE":0.000005,
+    "LAMBDA":0.0005,
+    "EPOCHS":150,
+    "ENCODER_NAME":"resnet34",
+    "DEVICE_LIST":[0],
+    "PATIENCE":5,
+    "DATALOADER_CONFIG":"./encoder_tissue_balance_v3_pretrained.yml"
+}

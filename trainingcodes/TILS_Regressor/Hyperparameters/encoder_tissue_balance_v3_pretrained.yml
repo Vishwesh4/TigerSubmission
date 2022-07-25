@@ -1,0 +1,55 @@
+wholeslidedata:
+  default:
+    seed: 53853
+    yaml_source: data_hooknet_edit_balanced_v3.yml
+
+    label_map:
+      roi: 0
+      invasive tumor: 1
+      tumor-associated stroma: 2
+      in-situ tumor: 3
+      healthy glands: 4
+      necrosis not in-situ: 5
+      inflamed stroma: 6
+      rest: 7
+
+    annotation_parser:
+      sample_label_names: [roi]
+
+  training:
+    batch_shape:
+      batch_size: 128
+      shape: [256, 256, 3]
+      y_shape: [256, 256, 7]
+      spacing: 0.5
+
+    point_sampler:
+      attribute: RandomPointSampler
+      buffer: -178
+
+    sample_callbacks:
+    - module: wholeslidedata.samplers.callbacks
+      attribute: FitOutput
+      output_shape: [256, 256]
+    - module: wholeslidedata.samplers.callbacks
+      attribute: OneHotEncoding
+      labels: ${wholeslidedata:labels}
+
+  inference:
+    batch_shape:
+      batch_size: 128
+      shape: [256, 256, 3]
+      y_shape: [256, 256, 7]
+      spacing: 0.5
+
+    point_sampler:
+      attribute: RandomPointSampler
+      buffer: -178
+
+    sample_callbacks:
+    - module: wholeslidedata.samplers.callbacks
+      attribute: FitOutput
+      output_shape: [256, 256]
+    - module: wholeslidedata.samplers.callbacks
+      attribute: OneHotEncoding
+      labels: ${wholeslidedata:labels}

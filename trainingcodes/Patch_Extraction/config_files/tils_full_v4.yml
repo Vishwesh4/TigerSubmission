@@ -1,0 +1,59 @@
+wholeslidedata:
+    default:
+        seed: 35
+        yaml_source: data_detection_v4.yml
+        
+        label_map:
+            roi: 0
+            invasive tumor: 1
+            tumor-associated stroma: 2
+            in-situ tumor: 3
+            healthy glands: 4
+            necrosis not in-situ: 5
+            inflamed stroma: 6
+            rest: 7
+            lymphocytes and plasma cells: 8
+            
+        annotation_parser:
+            sample_label_names: ['invasive tumor','tumor-associated stroma','rest','inflamed stroma','lymphocytes and plasma cells','in-situ tumor','healthy glands','necrosis not in-situ']
+
+        patch_label_sampler:
+            module: TILPatchLabelSampler
+            attribute: TILPatchLabelSampler
+    
+    training:
+        batch_shape:
+            batch_size: 64
+            shape: [256, 256, 3]
+            y_shape: [2,256,256]
+            spacing: 0.5
+
+        label_sampler@replace=true:
+            module: wholeslidedata.samplers.labelsampler
+            attribute: WeightedLabelSampler
+            labels: 
+                roi: 0
+                invasive tumor: 0.12
+                tumor-associated stroma: 0.15
+                in-situ tumor: 0.111
+                healthy glands: 0.111
+                necrosis not in-situ: 0.111
+                inflamed stroma: 0.12
+                rest: 0.117
+                lymphocytes and plasma cells: 0.16
+            seed: ${wholeslidedata:seed}
+        
+        point_sampler:
+            attribute: RandomPointSampler
+            buffer: -178
+
+    inference:
+        batch_shape:
+            batch_size: 64
+            shape: [256, 256, 3]
+            y_shape: [2,256,256]
+            spacing: 0.5
+
+        point_sampler:
+            attribute: RandomPointSampler
+            buffer: -178

@@ -1,0 +1,12 @@
+{
+    "DATASET_PATH":"/localdisk3/ramanav/Tumourbed_training",
+    "SAVE_DIR":"/home/ramanav/tiger_project/tigeralgorithmexample/modules/Tumourbed",
+    "DEVICE_LIST":[0,1,2],
+    "TRAIN_BATCH_SIZE":512,
+    "TEST_BATCH_SIZE":512,
+    "LEARNINGRATE":0.0005,
+    "LAMBDA":0.005,
+    "EPOCHS":150,
+    "PATIENCE":20,
+    "ENCODER_NAME": "resnet18"
+}

@@ -1,5 +1,7 @@
 # Tiger Submission For Leaderboard 2
-This repository contains the algorithm used to submit to tigerchallenge leaderboard 2 under the team name SRI
+This repository contains the algorithm used to submit to tigerchallenge leaderboard 2 under the team name [SRI](https://tiger.grand-challenge.org/teams/t/2150/).  
+The algorithm can be found [here](https://grand-challenge.org/algorithms/til-test6-2/).  
+The algorithm explaination can be found [here](https://rumc-gcorg-p-public.s3.amazonaws.com/evaluation-supplementary/636/062f1d55-09c0-455b-ae42-72035e8c5013/TIGER_L2_Submission.pdf)
 
 <img src="https://github.com/Vishwesh4/TigerSubmission/blob/master/img.png?raw=true" width="500" height="500">
 
@@ -36,12 +38,24 @@ Contains code for reading and writing. Includes function for reading a multi res
 ### processing
 Main processing file. Includes code for processing a slide and applies process functions to generate TILS score. The segmentation and detection JSON files generated are not valid and generated only for the purpose of submission.
 
+### saved_models
+`bihead_cell_tissue\resnet34` contains the saved model for the TILS regressor which is a bihead network with Resnet34 as its backbone. `tumorbed` contains the saved model for tumorbed binary classifier with Resnet18 as its backbone.
+
+### utils
+This directory contains helper functions for post processing and test time augmentations and TILS regressor model
+
+### TIL_score
+This file contains the main code where TIL score is calculated based on the patches collected while processing a whole slide image. It is assumed all the patches at a uniform stride can be stored in RAM for a single slide. For some slides there may be out of memory issues. Please contact the author/ raise an issue if that happens
+
+## trainingcodes
+Please read the `README.md` specified in the file
+
 ## Setup
 A simple and minimal setup file is included to install the package via pip. Note that the package is not in the PyPI repository.
 
 ## Dockerfile
 Dockerfile to be build and uploaded to grand-challenge. It installs 
- - Ubuntu20.04, 
+ - nvidia/cuda:11.1-devel-ubuntu20.04 
  - python3.8-venv, 
  - ASAP2.0, 
  - tigeralgorithmexample + requirements
