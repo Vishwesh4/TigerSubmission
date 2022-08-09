@@ -77,12 +77,12 @@ def apply_filter(loc:np.array,Image:np.array)->np.array:
         Image_filter[x,y] = average_value
     return Image_filter
 
-def postprocess_tissue(template:np.array,Tissue_calculation:np.array)-> np.array:
+def postprocess_tissue(template:np.array,tissue_calculation:np.array)-> np.array:
     """
     Performs postprocessing on a given slide on tissue calculation, by filling small holes,
     removing isolated pixels and performing anisotropic diffusion
     """
-    tumourbed,template = construct_image(template,Tissue_calculation)
+    tumourbed,template = construct_image(template,tissue_calculation)
     tumourbed = tumourbed.astype(np.uint8)
 
     #Processing
@@ -109,30 +109,34 @@ def postprocess_tissue(template:np.array,Tissue_calculation:np.array)-> np.array
     
     return processed_tissue
 
-def postprocess_tumorbed(template:np.array,spacing:float,Tumorbed_calculation:np.array) -> np.array:
+def postprocess_tumorbed(template:np.array,spacing:float,tumorbed_calculation:np.array, biopsy:bool) -> np.array:
     """
     Performs post processing on a given slide, by resizing, closing/opening, filling and removing isolated pixels,
     to give a processed tumorbed
     """
-    tissue_shape = np.shape(template)
+    # tissue_shape = np.shape(template)
     #Small buffer added, if ratio<0.5 then we dont perform any operation
-    temp_prop = 0.02 + np.sum(template>0)/(tissue_shape[0]*tissue_shape[1])
+    # temp_prop = 0.02 + np.sum(template>0)/(tissue_shape[0]*tissue_shape[1])
 
     resize_dim = (500,500)
     kernel_size = (3,3)
     fill_area_thresh_mm = 0.05
     remove_area_thresh_mm = 1.5
     
-    if temp_prop<0.5:
+    # if temp_prop<0.5:
+    if biopsy:
         #For biopsies with very less tissue area
+        print("Selected Biopsy mode...")
         resize_dim = (700,700)
         kernel_size = (2,2)
         fill_area_thresh_mm = 0.05
         remove_area_thresh_mm = 0.5
+    else:
+        print("Selected Resection mode...")
 
     # Read the mask at a reasonable level for fast processing.
 
-    tumourbed,template = construct_image(template,Tumorbed_calculation)
+    tumourbed,template = construct_image(template,tumorbed_calculation)
     tumourbed = tumourbed.astype(np.uint8)
     
     original_shape = np.shape(tumourbed.T)
@@ -153,7 +157,7 @@ def postprocess_tumorbed(template:np.array,spacing:float,Tumorbed_calculation:np
 
     return processed_tumorbed
 
-def postprocess(template:np.array,spacing:float,Tumorbed_calculation:np.array,Tissuebed_calculation:np.array) -> Union[np.array,np.array]:
+def postprocess(template:np.array,spacing:float,tumorbed_calculation:np.array,tissuebed_calculation:np.array,biopsy:bool) -> Union[np.array,np.array]:
     """
     Performs postprocessing on a given slide with calculated template, slide spacing, tumorbed calculation and tissuebed calculation
     Parameters:
@@ -165,7 +169,7 @@ def postprocess(template:np.array,spacing:float,Tumorbed_calculation:np.array,Ti
         processed_tumorbed: (np.array) Processed tumorbed probability map, consists of {0,1}
         processed_tissue: (np.array) Processed tissue density map
     """
-    processed_tumorbed = postprocess_tumorbed(template,spacing,Tumorbed_calculation)
-    processed_tissue = postprocess_tissue(template,Tissuebed_calculation)
+    processed_tumorbed = postprocess_tumorbed(template,spacing,tumorbed_calculation,biopsy)
+    processed_tissue = postprocess_tissue(template,tissuebed_calculation)
 
     return processed_tumorbed,processed_tissue

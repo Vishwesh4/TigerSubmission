@@ -1,5 +1,6 @@
 import warnings
 from tqdm import tqdm
+from time import time
 
 import numpy as np
 import torch
@@ -16,7 +17,8 @@ class TILEstimator_areaindv:
     def __init__(self,Tumor_path:str,
                  TIL_path:str,
                  transform,
-                 spacing,
+                 spacing:float,
+                 biopsy:bool,
                  is_tta = False,
                  transform_tta = [],
                  threshold_tumor=0.5,
@@ -29,6 +31,7 @@ class TILEstimator_areaindv:
         self.spacing = spacing
         self.tta = is_tta
         self.transform_tta = transform_tta
+        self.biopsy = biopsy
         #TIL network
         TILNet = Resnet_bihead_v2("resnet34",pretrained=False)
         
@@ -82,6 +85,7 @@ class TILEstimator_areaindv:
             return self.allpatch
     
     def compute_til(self):
+        self.start = time()
         dataset = self._form_dataset()
         dataloader = torch.utils.data.DataLoader(dataset,batch_size=64)
         with torch.no_grad():
@@ -104,7 +108,7 @@ class TILEstimator_areaindv:
                 self.allpatch_results = np.hstack((self.allpatch_results,results))
 
         #Post processing of results
-        processed_tumorbed,processed_tissue = postprocess(self.template,self.spacing,self.allpatch_results[0,:],self.allpatch_results[-1,:])
+        processed_tumorbed,processed_tissue = postprocess(self.template,self.spacing,self.allpatch_results[0,:],self.allpatch_results[-1,:],self.biopsy)
         self.allpatch_results[0,:] = processed_tumorbed
         self.allpatch_results[-1,:] = processed_tissue
 
@@ -119,6 +123,8 @@ class TILEstimator_areaindv:
         total_til = np.sum(X_til[1,:])
         total_tissues = np.sum(X_til[2,:])
         calc = 100*total_til/(total_tissues+0.00001)
+        self.end = time()
+        print("func: TIL score took %2.4f sec" % (self.end-self.start))
         return calc
     
     @staticmethod

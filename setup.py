@@ -8,7 +8,6 @@ setup(
     packages=find_packages(),
     license="LICENSE.txt",
     install_requires=[
-        "numpy==1.21.5",
         "tqdm==4.62.3",
         "torch==1.10.2",
         "torchvision==0.11.3",

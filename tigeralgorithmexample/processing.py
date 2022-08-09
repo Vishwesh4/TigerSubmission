@@ -1,7 +1,3 @@
-from typing import List
-import os
-import sys
-
 import numpy as np
 from tqdm import tqdm
 import torchvision
@@ -9,6 +5,7 @@ import torch
 import albumentations
 from pathlib import Path
 import shutil
+
 from .TIL_score import TILEstimator_areaindv
 
 from .gcio import (
@@ -28,6 +25,9 @@ from .rw import (
     TilsScoreWriter,
     open_multiresolutionimage_image,
 )
+
+
+print(f"Pytorch GPU available: {torch.cuda.is_available()}")
 
 def isforeground(patch,threshold=0.95):
         assert len(patch.shape)==2
@@ -76,6 +76,7 @@ def process():
                      albumentations.GaussianBlur(p=1)
                      ]
     #Set TIL scorer
+    BIOPSY = True
     PATH_SAVEDIR = Path("/home/user/saved_models")
     TUM_PATH = str(list((PATH_SAVEDIR/Path("tumorbed")).glob("*"))[0])
     TIL_PATH34 = str(list((PATH_SAVEDIR/Path("bihead_cell_tissue/res34")).glob("*"))[0])
@@ -83,6 +84,7 @@ def process():
                                       TIL_PATH34,
                                       transform=torchvision.transforms.ToTensor(),
                                       spacing=spacing_mean,
+                                      biopsy=BIOPSY,
                                       is_tta=True,
                                       transform_tta=transform_tta,
                                       device=torch.device("cuda"))
