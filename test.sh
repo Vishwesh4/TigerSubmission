@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
-DOCKERNAME="tiger_sri_biopsy"
+DOCKERNAME="tiger_sri_resection_chunk"
+# DOCKERNAME="tiger_sri_biopsy_chunk"
 
 SEGMENTATION_FILE="/output/images/breast-cancer-segmentation-for-tils/segmentation.tif"
 DETECTION_FILE="/output/detected-lymphocytes.json"
@@ -24,10 +25,13 @@ docker run --rm \
         --security-opt="no-new-privileges" \
         --shm-size=128m \
         --pids-limit=256 \
-        -v /home/vishwesh/Projects/testinputs/testinput_52/:/input/ \
+        -v /home/vishwesh/Projects/testinputs/testinput_TC_B103/:/input/ \
         -v tiger-output:/output/ \
         $DOCKERNAME
 
+# -v /home/vishwesh/Projects/testinputs/testinput_TC_B103/:/input/ \
+# -v /home/vishwesh/Projects/testinputs/testinput_104S/:/input/ \
+## -v /home/vishwesh/Projects/testinputs/testinput_52/:/input/ \
 echo "Checking output files..."
 docker run --rm \
         -v tiger-output:/output/ \

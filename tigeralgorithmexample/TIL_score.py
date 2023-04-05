@@ -84,12 +84,16 @@ class TILEstimator_areaindv:
         else:
             return self.allpatch
     
-    def compute_til(self):
-        self.start = time()
+    def timeit(self):
+        self.time.append(time())
+
+    def calculate_chunk(self):
+        self.timeit()
         dataset = self._form_dataset()
         dataloader = torch.utils.data.DataLoader(dataset,batch_size=64)
+        chunk_results = np.empty((3,0),np.float64)
         with torch.no_grad():
-            for data in tqdm(dataloader):
+            for data in tqdm(dataloader, desc=f"Processing chunk {len(self.time)}"):
                 images = data.to(self.device)
                 
                 if self.tta:
@@ -105,8 +109,18 @@ class TILEstimator_areaindv:
                 # raise ValueError
 
                 results = np.stack((is_relevant.cpu().numpy(),tilscore.cpu().ravel().numpy(),tissuescore.cpu().ravel().numpy()))
-                self.allpatch_results = np.hstack((self.allpatch_results,results))
+                chunk_results = np.hstack((chunk_results,results))
+        self.allpatch_results.append(chunk_results)
+        #Reset to save memory
+        self.allpatch = []
+        del dataset, chunk_results
 
+    def compute_til(self):
+        #Collect all results
+        if len(self.allpatch_results)==1:
+            self.allpatch_results = self.allpatch_results[0]
+        else:
+            self.allpatch_results = np.hstack(self.allpatch_results)
         #Post processing of results
         processed_tumorbed,processed_tissue = postprocess(self.template,self.spacing,self.allpatch_results[0,:],self.allpatch_results[-1,:],self.biopsy)
         self.allpatch_results[0,:] = processed_tumorbed
@@ -123,8 +137,9 @@ class TILEstimator_areaindv:
         total_til = np.sum(X_til[1,:])
         total_tissues = np.sum(X_til[2,:])
         calc = 100*total_til/(total_tissues+0.00001)
-        self.end = time()
-        print("func: TIL score took %2.4f sec" % (self.end-self.start))
+        calc = np.clip(calc,a_min=0,a_max=100)
+        self.timeit()
+        print("func: TIL score took %2.4f sec" % (self.time[-1]-self.time[0]))
         return calc
     
     @staticmethod
@@ -138,4 +153,6 @@ class TILEstimator_areaindv:
         self.template_list = []
         self.row_list = []
         self.count = 0
-        self.allpatch_results = np.empty((3,0),np.float64)
+        self.time = []
+        self.allpatch_results = []
+        # self.chunk_results = np.empty((3,0),np.float64)

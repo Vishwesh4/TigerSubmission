@@ -76,11 +76,12 @@ def process():
                      albumentations.GaussianBlur(p=1)
                      ]
     #Set TIL scorer
-    BIOPSY = True
+    # BIOPSY = True
+    BIOPSY = False
     PATH_SAVEDIR = Path("/home/user/saved_models")
     TUM_PATH = str(list((PATH_SAVEDIR/Path("tumorbed")).glob("*"))[0])
     TIL_PATH34 = str(list((PATH_SAVEDIR/Path("bihead_cell_tissue/res34")).glob("*"))[0])
-    TILScorer = TILEstimator_areaindv(TUM_PATH,
+    tilscorer = TILEstimator_areaindv(TUM_PATH,
                                       TIL_PATH34,
                                       transform=torchvision.transforms.ToTensor(),
                                       spacing=spacing_mean,
@@ -88,10 +89,12 @@ def process():
                                       is_tta=True,
                                       transform_tta=transform_tta,
                                       device=torch.device("cuda"))
+    CHUNK_LIMIT = 15000
     count = 0
+    chunk_counter = 0
     # loop over image and get tiles
     A = []
-    for y in tqdm(range(0, dimensions[1], tile_size)):
+    for y in tqdm(range(0, dimensions[1], tile_size),desc="Gathering patches"):
         B = []
         for x in range(0, dimensions[0], tile_size):
             tissue_mask_tile = tissue_mask.getUCharPatch(
@@ -104,18 +107,27 @@ def process():
                 image_tile = image.getUCharPatch(
                 startX=x, startY=y, width=tile_size, height=tile_size, level=level
                 )
-                TILScorer.collect(image_tile)
+                tilscorer.collect(image_tile)
+                chunk_counter+=1
             else:
                 fill = 0
             B.extend([fill])
+            #To prevent out of memory issue
+            if chunk_counter>=CHUNK_LIMIT:
+                #Reset chunk counter
+                chunk_counter = 0
+                tilscorer.calculate_chunk()
         B = np.array(B)
         A.append(B)
+    #In cases of incomplete chunk computation
+    if chunk_counter<CHUNK_LIMIT:
+        tilscorer.calculate_chunk()
     A = np.array(A).astype(np.float32)
     print("Computing tils score...")
-    TILScorer.get_template(A)
+    tilscorer.get_template(A)
     del A
     # raise ValueError("bhak")
-    tils_score = TILScorer.compute_til()
+    tils_score = tilscorer.compute_til()
     tils_score_writer.set_tils_score(tils_score=tils_score)
 
     print("Saving...")
