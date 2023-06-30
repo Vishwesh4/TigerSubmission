@@ -1,0 +1,1 @@
+Place 'tumorbed_detection_model.pt' model weight here.
