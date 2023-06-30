@@ -129,3 +129,6 @@ dmypy.json
 
 # tif files
 *.tif
+
+# saved model files
+*.pt

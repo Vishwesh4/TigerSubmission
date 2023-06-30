@@ -25,13 +25,10 @@ docker run --rm \
         --security-opt="no-new-privileges" \
         --shm-size=128m \
         --pids-limit=256 \
-        -v /home/vishwesh/Projects/testinputs/testinput_TC_B103/:/input/ \
+        -v /home/vishwesh/Projects/tigeralgo_inputs/:/input/ \
         -v tiger-output:/output/ \
         $DOCKERNAME
 
-# -v /home/vishwesh/Projects/testinputs/testinput_TC_B103/:/input/ \
-# -v /home/vishwesh/Projects/testinputs/testinput_104S/:/input/ \
-## -v /home/vishwesh/Projects/testinputs/testinput_52/:/input/ \
 echo "Checking output files..."
 docker run --rm \
         -v tiger-output:/output/ \
