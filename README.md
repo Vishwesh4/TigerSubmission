@@ -1,8 +1,8 @@
 # Tiger Submission For Leaderboard 2
 This repository contains the algorithm used to submit to tigerchallenge leaderboard 2 under the team name [SRI](https://tiger.grand-challenge.org/teams/t/2150/).  
 The algorithm can be found [here](https://grand-challenge.org/algorithms/til-test6-2/).  
-The algorithm explaination can be found [here](https://rumc-gcorg-p-public.s3.amazonaws.com/evaluation-supplementary/636/062f1d55-09c0-455b-ae42-72035e8c5013/TIGER_L2_Submission.pdf)
-The model weights for the algorithm can be found [here](https://zenodo.org/record/8102199) shared under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license
+The algorithm explaination can be found [here](https://rumc-gcorg-p-public.s3.amazonaws.com/evaluation-supplementary/636/062f1d55-09c0-455b-ae42-72035e8c5013/TIGER_L2_Submission.pdf).  
+The model weights for the algorithm can be found [here](https://zenodo.org/record/8102199) shared under the Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license.  
 <img src="https://github.com/Vishwesh4/TigerSubmission/blob/master/img.png?raw=true" width="500" height="500">
 
 ## Requirements
